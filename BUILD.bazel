@@ -19,6 +19,8 @@ load("//:bazel/typedast.bzl", "typedast")
 load("@com_github_johnynek_bazel_jar_jar//:jar_jar.bzl", "jar_jar")
 load("@google_bazel_common//testing:test_defs.bzl", "gen_java_tests")
 
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
+
 package(licenses = ["notice"])
 
 filegroup(
@@ -95,7 +97,7 @@ java_binary(
 
 java_library(
     name = "externs",
-    resources = [":externs_zip"],
+    resources = ["externs.zip"],
 )
 
 java_library(
@@ -136,7 +138,7 @@ oss_java_library(
     name = "compiler_lib_no_runtime_libs",
     java_attrs = dict(
         resources = [
-            ":externs_zip",
+            "externs.zip",
         ] + glob([
             "src/**/*.properties",
         ]),
@@ -181,13 +183,19 @@ oss_java_library(
     ),
 )
 
-genrule(
-    name = "externs_zip",
-    srcs = glob(["externs/**/*.js"]),
-    outs = ["externs.zip"],
-    # Trim the "externs/" prefix from the names of the ziped files.
-    cmd = "cd externs && find . -name '*.js' | zip ../$(OUTS) -@ &> /dev/null",
-)
+#genrule(
+#    name = "externs_zip",
+#    srcs = glob(["externs/**/*.js"]),
+#    outs = ["externs.zip"],
+#    # Trim the "externs/" prefix from the names of the ziped files.
+#    cmd = "cd externs && find . -name '*.js' | zip ../$(OUTS) -@ &> /dev/null",
+#)
+
+#pkg_zip(
+#    name = "externs_zip",
+#    package_dir = "externs",
+#    srcs = glob(["**/*.js"])
+#)
 
 # It's easier to make a copy of this Java file because the Java compiler can
 # tell us during build if something is wrong. By contrast, a resource lookup
